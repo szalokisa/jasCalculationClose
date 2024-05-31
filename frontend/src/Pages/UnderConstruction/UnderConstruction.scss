@@ -1,0 +1,15 @@
+.page-under-construction {
+    display: flex;
+    justify-content: center;
+    margin-top: 50px;
+    
+    .picture-area {
+        display: flex;
+        justify-content: center;
+        width: 80%;
+        img {
+            max-width: 80%;
+            height: auto;
+        }
+      }
+}
