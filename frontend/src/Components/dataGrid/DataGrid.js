@@ -1,3 +1,4 @@
+import { useRef, useEffect, useState } from 'react';
 import "./DataGrid.scss";
 import { AgGridColumn, AgGridReact } from "ag-grid-react";
 import FieldFormatters from "../../repository/FieldFormatters";
@@ -6,6 +7,17 @@ import "ag-grid-community/dist/styles/ag-theme-alpine.css";
 import LanguageElementsHandler from "../../repository/LanguageElementsHandler";
 
 export default function DataGrid(props) {
+  const gridRef = useRef();
+
+  const [gridApi, setGridApi] = useState();
+
+  useEffect(() => {
+    if (props.getSelectedRows) {
+      const selectedRows = gridRef.current.api.getSelectedRows();
+      props.getSelectedRowsCallback(selectedRows, props.getSelectedRows);
+    }
+  }, [props.getSelectedRows]);
+
   const languageElementsHandler = new LanguageElementsHandler(
     props.languageElements,
     props.language
@@ -129,7 +141,7 @@ export default function DataGrid(props) {
   };
 
   const gridColumns = props.columns.map((col) => {
-
+    // console.log('+++ DataGrid.js (line: 133)',col);
     const field = col.field || col.name;
 
     let fieldCellRenderer;
@@ -228,19 +240,33 @@ export default function DataGrid(props) {
       style={{ height: props.gridHeight || "70vh", width: "100%" }}
     >
       <AgGridReact
+        ref={gridRef}
         rowData={gridData}
         columnTypes={columnTypes}
         frameworkComponents={props.frameworkComponents}
         rowSelection={props.rowSelection} //multiple / single
-        rowMultiSelectWithClick={props.rowMultiSelectWithClick} //true
+        isRowSelectable={() => (true)}    //{props.isRowSelectable}  //function, returns false or true
+        rowMultiSelectWithClick={true}   //{props.rowMultiSelectWithClick} //true
+        rowClassRules={props.rowDesign}
         onRowDoubleClicked={(row) => onRowDoubleClick(row)}
+        onGridReady={params => (setGridApi(params.api))}
+        onSelectionChanged={() => {
+          if (props.onSelectionChanged) {
+            const selectedRows = gridRef.current.api.getSelectedRows();
+            props.onSelectionChanged(selectedRows);
+          }
+        }}
       >
         {gridColumns.map((col) => (
           <AgGridColumn
             key={col.field}
             field={col.field}
             headerName={languageElementsHandler.get(`field-${col.field}`)}
+            headerCheckboxSelection= {(col.field === 'ID')}  // {(col.field === props.checkboxColumn)}
+            headerCheckboxSelectionFilteredOnly={true}
+            checkboxSelection={(col.field === 'ID')}//{(col.field === props.checkboxColumn)}
             sortable
+            floatingFilter={col.field !== props.checkboxColumn && !col.hideFloatingFilter}
             type={col.type ? getColumnTypeNormalised(col.type) : "default"}
             cellRenderer={col.cellRenderer}
             cellRendererParams={col.cellRendererParams}

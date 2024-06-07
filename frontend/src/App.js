@@ -11,7 +11,6 @@ function App() {
 
   function getLanguage() {
     const urlParams = new URLSearchParams(window.location.search);
-    console.log('+++ App.js (line: 14)', urlParams.get('language') || 'en');
     return urlParams.get('language') || 'en';
   }
 

@@ -7,14 +7,14 @@ export default function ListViewCalculations(props) {
     function refreshGrid() {
         setRefreshId(currentRefreshId => (currentRefreshId + 1));
     }
-    console.log('+++ ListviewCalculations.js (line: 8)', props);
     return (
         <div className="page-listview">
             <div className="grid-area" >
                 <CalculationsGrid
                     language={props.language}
                     loginData={props.loginData}
-                    refreshId={refreshId}>
+                    refreshId={refreshId}
+                    rowSelection={'multiple'}>
                 </CalculationsGrid>
             </div>
         </div>

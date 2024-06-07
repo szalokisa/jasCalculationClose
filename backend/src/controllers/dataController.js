@@ -37,13 +37,12 @@ export const dataController = {
 
     async upsertRecords(req, res, next) {
         let result;
-
         try {
             result = await dataService.upsertRecords(
                 req.verified,
                 {
                     collection: req.body.collection,
-                    data: req.body.data,
+                    data: req.body.selectedRows,
                 });
             res.status(200).json(result);
         } catch (error) {

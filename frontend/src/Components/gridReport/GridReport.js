@@ -7,8 +7,19 @@ import LanguageElementsHandler from '../../repository/LanguageElementsHandler';
 import ExcelExport from '../excelExport/ExcelExport';
 import RefreshIcon from './reload.svg';
 import PlusIcon from './plus.svg';
+import FiveSecondsAlert from '../alerts/fiveSecondsAlert/FiveSecondsAlert';
+
 
 export default function GridReport(props) {
+  const [getSelectedRows, activateSelectedRows] = useState(undefined);
+  const [stateOfFiveSecondsAlert, setStateOfFiveSecondsAlert] = useState({
+    show: false,
+    message: {
+      title: '',
+      body: '',
+    }
+  });
+
   const languageElementsHandler = new LanguageElementsHandler(
     props.report.languageElements,
     props.language,
@@ -52,14 +63,12 @@ export default function GridReport(props) {
     }
   }, [props.language, props.refreshId || 0]);
 
-  console.log('+++ GridReport.js (line: 100)',props);
-
   function showDataIfNotCollapsed() {
     if (props.report.fixFilter) {
       showData();
       return;
     }
-    
+
     if (accordionData.current) {
       if (!accordionData.current.classList.contains('collapsed')) {
         showData();
@@ -99,7 +108,6 @@ export default function GridReport(props) {
   }
 
   function showData() {
-    //console.log('+++ GridReport.js (line: 100)',props);
     setDataLoadingState('LOADING');
     fetch(`${props.dataEndpoint}`, {
       method: 'GET',
@@ -182,9 +190,39 @@ export default function GridReport(props) {
     );
 
   }
-  
+
+  function modifyCalculations(selectedRows) {
+    const IDs = selectedRows.map(e => e.ID);
+// debugger
+    if (IDs.length === 0) {
+      setStateOfFiveSecondsAlert({
+        show: true,
+        variant: 'danger',
+        message: {
+          title: languageElementsHandler.get('alert-no-rows-selected-title'),
+          body: languageElementsHandler.get('alert-no-rows-selected-body'),
+        }
+      })
+
+      return;
+    }
+
+    props.modifyCalculations(IDs);
+
+  }
+
   return (
     <div className="grid-report">
+      <FiveSecondsAlert
+        show={stateOfFiveSecondsAlert.show}
+        language={props.language}
+        message={stateOfFiveSecondsAlert.message}
+        variant={stateOfFiveSecondsAlert.variant}
+        interval={stateOfFiveSecondsAlert.interval}
+        className={stateOfFiveSecondsAlert.className}
+        callback={() => { setStateOfFiveSecondsAlert({ show: false }); }}
+      />
+
       <div className="accordion accordion-flush" id="accordionFlushExample">
         <div className="accordion-item">
           <h2 className="accordion-header" id="grid-report-flush-filter">
@@ -242,19 +280,29 @@ export default function GridReport(props) {
                 </div>
               </div>
             )}
-
             {dataLoadingState === 'LOADED' && (
               <div className="accordion-body">
                 <div className="accordion-body-header">
-                  {props.onAddNew &&
-                    <button type="button" className="btn btn-warning btn-add" onClick={addNew}>
-                      <img className="Add-icon" src={PlusIcon} alt="Add-icon.svg" />
+                  <div className='accordion-body-header-left'>
+                    <button type="button"
+                      class="btn btn-outline-success"
+                      onClick={(e) => activateSelectedRows('MODIFY_CALCULATIONS')}
+                    >
+                      {languageElementsHandler.get('btn-success')}
                     </button>
-                  }
-                  <button type="button" className="btn btn-warning btn-refresh-report" onClick={showDataIfNotCollapsed}>
-                    <img className="Refresh-icon" src={RefreshIcon} alt="Refresh-icon.svg" />
-                  </button>
-                  <ExcelExport data={gridData} />
+                  </div>
+
+                  <div className='accordion-body-header-right'>
+                    {props.onAddNew &&
+                      <button type="button" className="btn btn-warning btn-add" onClick={addNew}>
+                        <img className="Add-icon" src={PlusIcon} alt="Add-icon.svg" />
+                      </button>
+                    }
+                    <button type="button" className="btn btn-warning btn-refresh-report" onClick={showDataIfNotCollapsed}>
+                      <img className="Refresh-icon" src={RefreshIcon} alt="Refresh-icon.svg" />
+                    </button>
+                    <ExcelExport data={gridData} />
+                  </div>
                 </div>
 
                 <DataGrid
@@ -263,11 +311,18 @@ export default function GridReport(props) {
                   language={props.language}
                   languageElements={props.report.languageElements}
                   data={gridData}
+                  isRowSelectable={props.isRowSelectable}
                   frameworkComponents={props.report.frameWorkComponents}
                   cellRenderers={props.report.cellRenderers}
                   rowSelection={props.rowSelection}
                   rowMultiSelectWithClick={props.rowMultiSelectWithClick}
                   onRowDoubleClick={(row) => onRowDoubleClick(row)}
+
+                  getSelectedRows={getSelectedRows}
+                  getSelectedRowsCallback={(selectedRows, func) => {
+                    activateSelectedRows(false);
+                    modifyCalculations(selectedRows)
+                  }}
                 />
               </div>
             )}

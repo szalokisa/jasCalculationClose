@@ -1,3 +1,4 @@
+import { query } from "express";
 import {
     SYS_GRID_DATA_DELETE,
     SYS_GRID_DATA_GET,
