@@ -7,6 +7,7 @@ export default function ListViewCalculations(props) {
     function refreshGrid() {
         setRefreshId(currentRefreshId => (currentRefreshId + 1));
     }
+
     return (
         <div className="page-listview">
             <div className="grid-area" >

@@ -11,5 +11,11 @@ export const languageElements = {
             de: 'Einige Felder enthalten falsche Werte',
             en: 'Some fields have incorrect content',
         },
+
+        'process-ended': {
+            hu: 'A művelet befejeződött',
+            de: 'operation completed',
+            en: 'operation completed',
+        },
     }
 }

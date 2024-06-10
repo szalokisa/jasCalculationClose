@@ -96,7 +96,7 @@ export const languageElements = {
             en: "PDate",
         },
         "btn-success": {
-            hu: "Kijelölt kalkulációk státuszának módosítása",
+            hu: "Kijelölt kalkulációk törlése",
             de: "OK",
             en: "OK",
         },
@@ -116,6 +116,30 @@ export const languageElements = {
             hu: 'Válasszon ki sorokat.',
             de: 'Wählen Sie Zeilen von der Liste aus',
             en: 'Select transports from the list',
+          },
+
+          'modal-title': {
+            hu: 'Figyelem!.',
+            de: 'Achtung$',
+            en: 'Attention$',
+          },
+
+          'modal-body': {
+            hu: 'A kijelölt kalkulációk véglegesen törlésre kerülnek. Folytatja?',
+            de: 'Continue?',
+            en: 'Continue?',
+          },
+
+          'answer-yes': {
+            hu: 'Igen',
+            de: 'Ja',
+            en: 'Yes',
+          },
+
+          'answer-no': {
+            hu: 'Nem',
+            de: 'Nein',
+            en: 'No',
           },
     },
 }

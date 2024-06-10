@@ -141,7 +141,6 @@ export default function DataGrid(props) {
   };
 
   const gridColumns = props.columns.map((col) => {
-    // console.log('+++ DataGrid.js (line: 133)',col);
     const field = col.field || col.name;
 
     let fieldCellRenderer;
@@ -245,7 +244,7 @@ export default function DataGrid(props) {
         columnTypes={columnTypes}
         frameworkComponents={props.frameworkComponents}
         rowSelection={props.rowSelection} //multiple / single
-        isRowSelectable={() => (true)}    //{props.isRowSelectable}  //function, returns false or true
+        isRowSelectable={props.isRowSelectable}  //function, returns false or true
         rowMultiSelectWithClick={true}   //{props.rowMultiSelectWithClick} //true
         rowClassRules={props.rowDesign}
         onRowDoubleClicked={(row) => onRowDoubleClick(row)}

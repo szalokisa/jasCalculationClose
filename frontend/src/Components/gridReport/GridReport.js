@@ -8,7 +8,7 @@ import ExcelExport from '../excelExport/ExcelExport';
 import RefreshIcon from './reload.svg';
 import PlusIcon from './plus.svg';
 import FiveSecondsAlert from '../alerts/fiveSecondsAlert/FiveSecondsAlert';
-
+import SimpleModal from '../modals/simpleModal/SimpleModal';
 
 export default function GridReport(props) {
   const [getSelectedRows, activateSelectedRows] = useState(undefined);
@@ -29,6 +29,9 @@ export default function GridReport(props) {
   const [dataLoadingState, setDataLoadingState] = useState('NOT PREPARED');
   const [gridData, setGridData] = useState([]);
   const [gridColumns, setGridColumns] = useState([]);
+  const [modalShow, setModalShow] = useState({
+    show: false,
+  });
 
   useEffect(() => {
     setDataLoadingState('NOT PREPARED');
@@ -191,24 +194,8 @@ export default function GridReport(props) {
 
   }
 
-  function modifyCalculations(selectedRows) {
-    const IDs = selectedRows.map(e => e.ID);
-// debugger
-    if (IDs.length === 0) {
-      setStateOfFiveSecondsAlert({
-        show: true,
-        variant: 'danger',
-        message: {
-          title: languageElementsHandler.get('alert-no-rows-selected-title'),
-          body: languageElementsHandler.get('alert-no-rows-selected-body'),
-        }
-      })
-
-      return;
-    }
-
+  function modifyCalculations(IDs) {
     props.modifyCalculations(IDs);
-
   }
 
   return (
@@ -221,6 +208,33 @@ export default function GridReport(props) {
         interval={stateOfFiveSecondsAlert.interval}
         className={stateOfFiveSecondsAlert.className}
         callback={() => { setStateOfFiveSecondsAlert({ show: false }); }}
+      />
+
+      <SimpleModal
+        show={modalShow.show}
+        // title="### Message"
+        title = {languageElementsHandler.get('modal-title')}
+        body={languageElementsHandler.get('modal-body')}
+        buttons={[
+          {
+            id: "NO",
+            text: languageElementsHandler.get('answer-no'),
+            variant: "secondary",
+          },
+          {
+            id: "YES",
+            text: languageElementsHandler.get('answer-yes'),
+            variant: "primary",
+          }
+        ]}
+        params={modalShow.params}
+        callback={(buttonId, params) => {
+          setModalShow({
+            show: false
+          });
+          // alert(`Answer: ${buttonId}`);
+          modifyCalculations(params.IDs)
+        }}
       />
 
       <div className="accordion accordion-flush" id="accordionFlushExample">
@@ -285,7 +299,7 @@ export default function GridReport(props) {
                 <div className="accordion-body-header">
                   <div className='accordion-body-header-left'>
                     <button type="button"
-                      class="btn btn-outline-success"
+                      className="btn btn-outline-success"
                       onClick={(e) => activateSelectedRows('MODIFY_CALCULATIONS')}
                     >
                       {languageElementsHandler.get('btn-success')}
@@ -321,7 +335,26 @@ export default function GridReport(props) {
                   getSelectedRows={getSelectedRows}
                   getSelectedRowsCallback={(selectedRows, func) => {
                     activateSelectedRows(false);
-                    modifyCalculations(selectedRows)
+
+                    const IDs = selectedRows.map(e => e.ID);
+                    if (IDs.length === 0) {
+                      setStateOfFiveSecondsAlert({
+                        show: true,
+                        variant: 'danger',
+                        message: {
+                          title: languageElementsHandler.get('alert-no-rows-selected-title'),
+                          body: languageElementsHandler.get('alert-no-rows-selected-body'),
+                        }
+                      })
+                      return;
+                    }
+
+                    setModalShow({
+                      show: true,
+                      params: {
+                        IDs
+                      }
+                    });
                   }}
                 />
               </div>

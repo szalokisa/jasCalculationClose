@@ -79,6 +79,9 @@ export const reportParams = {
         field: 'Inv_Status',
         width: 150,
     },
+    {
+        field: 'rowSelectingStatus',
+    },
 
     ],
     sort: 'PosNr',
